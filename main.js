@@ -1,21 +1,31 @@
-const { app, BrowserWindow } = require('electron'); // Ensure Electron is properly imported
+const { app, BrowserWindow, ipcMain } = require('electron');
 const path = require('path');
+
+let mainWindow;
 
 // Function to create the main window
 function createWindow() {
-    const mainWindow = new BrowserWindow({
+    mainWindow = new BrowserWindow({
         width: 800,
-        height: 600,
+        height: 450,
         alwaysOnTop: true, // Optional: Keep the window on top of others
         frame: false, // Optional: Remove the window frame
         webPreferences: {
-            preload: path.join(__dirname, 'preload.js'), // Optional: If no preload script, remove this line
-            nodeIntegration: true, // Allows Node.js in your HTML
-            contextIsolation: false, // Allows the use of require in renderer processes
+            preload: path.join(__dirname, 'preload.js'), // Optional preload
+            contextIsolation: true,
+            nodeIntegration: false,
+            enableRemoteModule: false,
+            sandbox: true,
         },
     });
 
     mainWindow.loadFile('index.html'); // Load your HTML file
+
+    ipcMain.on('close-window', () => {
+        if (mainWindow) {
+            mainWindow.close();
+        }
+    });
 }
 
 // Ensure the app is ready before creating windows
