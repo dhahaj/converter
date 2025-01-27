@@ -20,6 +20,26 @@
             padding: 20px;
             border-radius: 10px;
             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+            position: relative;
+        }
+        .close-icon {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            cursor: pointer;
+            font-size: 20px;
+            color: #e0e0e0;
+            background-color: #444;
+            border: none;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .close-icon:hover {
+            background-color: #ff4d4d;
         }
         select, input, button {
             margin: 10px;
@@ -30,7 +50,7 @@
             border: 1px solid #444;
             border-radius: 5px;
         }
-        select:focus, input:focus {
+        select:focus, input:focus, button:focus {
             outline: none;
             border-color: #007BFF;
         }
@@ -52,8 +72,10 @@
 </head>
 <body>
     <div class="container">
+        <button class="close-icon" onclick="closeWindow()">&times;</button>
         <h1>Length Converter</h1>
         <input type="number" id="inputValue" placeholder="Enter value" oninput="convert()" />
+        <br>
         <select id="inputUnit" onchange="convert()">
             <option value="mil">mil</option>
             <option value="mm">mm</option>
@@ -62,7 +84,7 @@
             <option value="ft">ft</option>
             <option value="in">in</option>
             <option value="m">m</option>
-            <option value="miles">Miles</option>
+            <option value="miles">miles</option>
         </select>
         <select id="outputUnit" onchange="convert()">
             <option value="mm">mm</option>
@@ -72,13 +94,14 @@
             <option value="ft">ft</option>
             <option value="in">in</option>
             <option value="m">m</option>
-            <option value="miles">Miles</option>
+            <option value="miles">miles</option>
         </select>
         <br>
         <button onclick="reverseUnits()">Reverse Units</button>
         <p id="result"></p>
     </div>
     <script>
+
         const conversionRates = {
             m: { m: 1, mm: 1000, cm: 100, km: 0.001, ft: 3.28084, in: 39.3701, mil: 39370.1, miles: 0.000621371 },
             mm: { m: 0.001, mm: 1, cm: 0.1, km: 0.000001, ft: 0.00328084, in: 0.0393701, mil: 39.3701, miles: 0.000000621371 },
@@ -116,6 +139,11 @@
             // Trigger conversion after reversing
             convert();
         }
+
+        function closeWindow() {
+            window.api.closeWindow();
+        }
+
     </script>
 </body>
 </html>
