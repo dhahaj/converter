@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Length Converter</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #121212;
+            color: #e0e0e0;
+            -webkit-app-region: drag; /* Make the whole window draggable */
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            text-align: center;
+            background-color: #1e1e1e;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+        }
+        select, input, button {
+            margin: 10px;
+            padding: 10px;
+            font-size: 16px;
+            background-color: #2c2c2c;
+            color: #e0e0e0;
+            border: 1px solid #444;
+            border-radius: 5px;
+        }
+        select:focus, input:focus {
+            outline: none;
+            border-color: #007BFF;
+        }
+        #result {
+            font-size: 20px;
+            margin: 20px;
+        }
+        .highlight {
+            font-weight: bold;
+            color: #4caf50;
+        }
+        h1 {
+            color: #4caf50;
+        }
+        input, select, button {
+            -webkit-app-region: no-drag; /* Excludes interactive elements from dragging */
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Length Converter</h1>
+        <input type="number" id="inputValue" placeholder="Enter value" oninput="convert()" />
+        <select id="inputUnit" onchange="convert()">
+            <option value="mil">mil</option>
+            <option value="mm">mm</option>
+            <option value="cm">cm</option>
+            <option value="km">km</option>
+            <option value="ft">ft</option>
+            <option value="in">in</option>
+            <option value="m">m</option>
+            <option value="miles">Miles</option>
+        </select>
+        <select id="outputUnit" onchange="convert()">
+            <option value="mm">mm</option>
+            <option value="mil">mil</option>
+            <option value="cm">cm</option>
+            <option value="km">km</option>
+            <option value="ft">ft</option>
+            <option value="in">in</option>
+            <option value="m">m</option>
+            <option value="miles">Miles</option>
+        </select>
+        <br>
+        <button onclick="reverseUnits()">Reverse Units</button>
+        <p id="result"></p>
+    </div>
+    <script>
+        const conversionRates = {
+            m: { m: 1, mm: 1000, cm: 100, km: 0.001, ft: 3.28084, in: 39.3701, mil: 39370.1, miles: 0.000621371 },
+            mm: { m: 0.001, mm: 1, cm: 0.1, km: 0.000001, ft: 0.00328084, in: 0.0393701, mil: 39.3701, miles: 0.000000621371 },
+            cm: { m: 0.01, mm: 10, cm: 1, km: 0.00001, ft: 0.0328084, in: 0.393701, mil: 393.701, miles: 0.00000621371 },
+            km: { m: 1000, mm: 1000000, cm: 100000, km: 1, ft: 3280.84, in: 39370.1, mil: 39370100, miles: 0.621371 },
+            ft: { m: 0.3048, mm: 304.8, cm: 30.48, km: 0.0003048, ft: 1, in: 12, mil: 12000, miles: 0.000189394 },
+            mil: { m: 0.0000254, mm: 0.0254, cm: 0.00254, km: 0.0000000254, ft: 0.0000833333, in: 0.001, mil: 1, miles: 0.0000000157828 },
+            in: { m: 0.0254, mm: 25.4, cm: 2.54, km: 0.0000254, ft: 0.0833333, in: 1, mil: 1000, miles: 0.0000157828 },
+            miles: { m: 1609.34, mm: 1609340, cm: 160934, km: 1.60934, ft: 5280, in: 63360, mil: 63360000, miles: 1 }
+        };
+
+        function convert() {
+            const inputValue = parseFloat(document.getElementById('inputValue').value);
+            const inputUnit = document.getElementById('inputUnit').value;
+            const outputUnit = document.getElementById('outputUnit').value;
+
+            if (isNaN(inputValue)) {
+                document.getElementById('result').textContent = 'Please enter a valid number';
+                return;
+            }
+
+            const result = inputValue * conversionRates[inputUnit][outputUnit];
+            document.getElementById('result').innerHTML = `${inputValue} ${inputUnit} is equal to <span class="highlight">${parseFloat(result.toFixed(8))} ${outputUnit}</span>`;
+        }
+
+        function reverseUnits() {
+            const inputUnit = document.getElementById('inputUnit');
+            const outputUnit = document.getElementById('outputUnit');
+
+            // Swap the values of the input and output units
+            const temp = inputUnit.value;
+            inputUnit.value = outputUnit.value;
+            outputUnit.value = temp;
+
+            // Trigger conversion after reversing
+            convert();
+        }
+    </script>
+</body>
+</html>
