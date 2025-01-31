@@ -2,12 +2,18 @@ const { app, BrowserWindow, ipcMain, Menu } = require('electron');
 const path = require('path');
 
 let mainWindow;
+let store;
 
-function createWindow() {
+async function createWindow() {
+    // Dynamically import electron-store
+    const { default: Store } = await import('electron-store');
+    store = new Store();
+
+    const alwaysOnTopSetting = store.get('alwaysOnTop', true);
     mainWindow = new BrowserWindow({
         width: 800,
         height: 450,
-        alwaysOnTop: true, // Initially enabled
+        alwaysOnTop: alwaysOnTopSetting,
         frame: false,
         webPreferences: {
             preload: path.join(__dirname, 'preload.js'),
@@ -22,7 +28,6 @@ function createWindow() {
 
     mainWindow.loadFile('index.html');
 
-    // Build an application menu (optional, as you already have an HTML toggle)
     const menuTemplate = [
         {
             label: 'Options',
@@ -30,9 +35,10 @@ function createWindow() {
                 {
                     label: 'Always on Top',
                     type: 'checkbox',
-                    checked: mainWindow.isAlwaysOnTop(),
+                    checked: alwaysOnTopSetting,
                     click: (menuItem) => {
                         mainWindow.setAlwaysOnTop(menuItem.checked);
+                        store.set('alwaysOnTop', menuItem.checked);
                     },
                 },
             ],
@@ -46,15 +52,19 @@ function createWindow() {
         if (mainWindow) mainWindow.close();
     });
 
-    // Listen for always on top setting from the HTML toggle
     ipcMain.on('set-always-on-top', (event, value) => {
         if (mainWindow) {
             mainWindow.setAlwaysOnTop(value);
+            store.set('alwaysOnTop', value);
         }
+    });
+
+    ipcMain.handle('get-always-on-top', () => {
+        return mainWindow ? mainWindow.isAlwaysOnTop() : true;
     });
 }
 
-app.on('ready', createWindow);
+app.whenReady().then(createWindow);
 
 app.on('activate', () => {
     if (BrowserWindow.getAllWindows().length === 0) createWindow();

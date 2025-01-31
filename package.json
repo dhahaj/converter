@@ -1,7 +1,8 @@
 {
   "devDependencies": {
     "electron": "^34.0.1",
-    "electron-packager": "^17.1.2"
+    "electron-packager": "^17.1.2",
+    "electron-store": "^10.0.1"
   },
   "name": "converter",
   "version": "1.0.0",
