@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -10,8 +11,10 @@
             margin: 20px;
             background-color: #121212;
             color: #e0e0e0;
-            -webkit-app-region: drag; /* Make the whole window draggable */
+            -webkit-app-region: drag;
+            /* Make the whole window draggable */
         }
+
         .container {
             max-width: 600px;
             margin: 0 auto;
@@ -22,6 +25,7 @@
             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
             position: relative;
         }
+
         .close-icon {
             position: absolute;
             top: 10px;
@@ -38,10 +42,14 @@
             align-items: center;
             justify-content: center;
         }
+
         .close-icon:hover {
             background-color: #ff4d4d;
         }
-        select, input, button {
+
+        select,
+        input,
+        button {
             margin: 10px;
             padding: 10px;
             font-size: 16px;
@@ -50,31 +58,42 @@
             border: 1px solid #444;
             border-radius: 5px;
         }
-        select:focus, input:focus, button:focus {
+
+        select:focus,
+        input:focus,
+        button:focus {
             outline: none;
             border-color: #007BFF;
         }
+
         #result {
             font-size: 20px;
             margin: 20px;
         }
+
         .highlight {
             font-weight: bold;
             color: #4caf50;
         }
+
         h1 {
             color: #4caf50;
         }
-        input, select, button {
-            -webkit-app-region: no-drag; /* Excludes interactive elements from dragging */
+
+        input,
+        select,
+        button {
+            -webkit-app-region: no-drag;
+            /* Excludes interactive elements from dragging */
         }
     </style>
 </head>
+
 <body>
     <div class="container">
         <button class="close-icon" onclick="closeWindow()">&times;</button>
         <h1>Length Converter</h1>
-        <input type="number" id="inputValue" placeholder="Enter value" oninput="convert()" />
+        <input type="text" id="inputValue" placeholder="Enter value or expression" oninput="convert()" />
         <br>
         <select id="inputUnit" onchange="convert()">
             <option value="mil">mil</option>
@@ -98,10 +117,14 @@
         </select>
         <br>
         <button onclick="reverseUnits()">Reverse Units</button>
+        <br>
+        <label>
+            <input type="checkbox" id="alwaysOnTopToggle" onclick="toggleAlwaysOnTop()" checked>
+            Always on Top
+        </label>
         <p id="result"></p>
     </div>
     <script>
-
         const conversionRates = {
             m: { m: 1, mm: 1000, cm: 100, km: 0.001, ft: 3.28084, in: 39.3701, mil: 39370.1, miles: 0.000621371 },
             mm: { m: 0.001, mm: 1, cm: 0.1, km: 0.000001, ft: 0.00328084, in: 0.0393701, mil: 39.3701, miles: 0.000000621371 },
@@ -114,17 +137,25 @@
         };
 
         function convert() {
-            const inputValue = parseFloat(document.getElementById('inputValue').value);
+            const inputField = document.getElementById('inputValue');
+            const inputValue = inputField.value;
             const inputUnit = document.getElementById('inputUnit').value;
             const outputUnit = document.getElementById('outputUnit').value;
 
-            if (isNaN(inputValue)) {
-                document.getElementById('result').textContent = 'Please enter a valid number';
-                return;
-            }
+            try {
+                // Evaluate the mathematical expression safely
+                const evaluatedValue = Function(`'use strict'; return (${inputValue})`)();
 
-            const result = inputValue * conversionRates[inputUnit][outputUnit];
-            document.getElementById('result').innerHTML = `${inputValue} ${inputUnit} is equal to <span class="highlight">${parseFloat(result.toFixed(8))} ${outputUnit}</span>`;
+                if (isNaN(evaluatedValue)) {
+                    document.getElementById('result').textContent = 'Invalid input. Please enter a valid number or expression.';
+                    return;
+                }
+
+                const result = evaluatedValue * conversionRates[inputUnit][outputUnit];
+                document.getElementById('result').innerHTML = `${evaluatedValue} ${inputUnit} is equal to <span class="highlight">${parseFloat(result.toFixed(8))} ${outputUnit}</span>`;
+            } catch (error) {
+                document.getElementById('result').textContent = 'Invalid input. Please enter a valid number or expression.';
+            }
         }
 
         function reverseUnits() {
@@ -144,6 +175,23 @@
             window.api.closeWindow();
         }
 
+        document.getElementById('inputValue').focus();
+        
+        // Listen for Enter key press
+        document.addEventListener('keydown', (event) => {
+            if (event.key === 'Escape') {
+                document.getElementById('inputValue').value = '';
+                document.getElementById('result').textContent = '';
+            }
+        });
+
+        function toggleAlwaysOnTop() {
+            const isChecked = document.getElementById('alwaysOnTopToggle').checked;
+            // Send the new setting to the main process via the preload API.
+            window.api.setAlwaysOnTop(isChecked);
+        }
+
     </script>
 </body>
+
 </html>
