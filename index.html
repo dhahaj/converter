@@ -66,6 +66,9 @@
             border-color: #007BFF;
         }
 
+        #alwaysOnTopToggle {
+        }
+
         #result {
             font-size: 20px;
             margin: 20px;
@@ -84,7 +87,6 @@
         select,
         button {
             -webkit-app-region: no-drag;
-            /* Excludes interactive elements from dragging */
         }
     </style>
 </head>
@@ -166,6 +168,26 @@
             const temp = inputUnit.value;
             inputUnit.value = outputUnit.value;
             outputUnit.value = temp;
+
+            const inputField = document.getElementById('inputValue');
+            const inputValue = inputField.value;
+
+            const result = document.getElementById('result').textContent;
+            console.log(result);
+
+            // Copy the numeric result to the input field
+            const numericResult = result.split(' ')[5];
+            console.log(numericResult);
+
+            // round the number to 4 decimal places
+            const roundedResult = parseFloat(numericResult).toFixed(4);
+            console.log(roundedResult);
+
+            document.getElementById('inputValue').value = roundedResult;
+
+            // copy to the clipboard
+            navigator.clipboard.writeText(roundedResult);
+            
 
             // Trigger conversion after reversing
             convert();

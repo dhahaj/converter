@@ -48,6 +48,9 @@ async function createWindow() {
     const menu = Menu.buildFromTemplate(menuTemplate);
     Menu.setApplicationMenu(menu);
 
+    // show dev tools
+    // mainWindow.webContents.openDevTools();
+
     ipcMain.on('close-window', () => {
         if (mainWindow) mainWindow.close();
     });
